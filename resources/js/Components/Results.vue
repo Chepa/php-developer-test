@@ -2,7 +2,8 @@
 import {watch, computed, onMounted, ref} from "vue";
 const props = defineProps({
     results: Array,
-    pagination: Object
+    pagination: Object,
+    loading: Boolean
 });
 const emit = defineEmits(["setPaginationPage"]);
 const currentPage = computed(() => props.pagination.page);
@@ -19,7 +20,7 @@ watch(
 </script>
 <template>
     <p>Results:</p>
-    <el-table :data="results" style="width: 100%">
+    <el-table v-loading="loading" :data="results" style="width: 100%">
         <el-table-column prop="name" label="Name" width="180"/>
         <el-table-column prop="price" label="Price" width="180"/>
         <el-table-column prop="bedrooms" label="Bedrooms" width="180"/>

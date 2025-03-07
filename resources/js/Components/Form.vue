@@ -1,7 +1,7 @@
 <script setup>
 import {onMounted, ref, watch} from "vue"
 
-const emit = defineEmits(["getResults"]);
+const emit = defineEmits(["getResults", 'setLoading']);
 const rageFilters = ref({});
 const maxPrice = ref(0);
 const form = ref({
@@ -41,11 +41,15 @@ onMounted(() => {
     }
 });
 const submit = () => {
-    axios.post('/search', form.value).then((response) => {
-        if (response.data.data) {
-            getResults(response.data);
-        }
-    });
+    emit('setLoading', true);
+    setTimeout(() => {
+        axios.post('/search', form.value).then((response) => {
+            emit('setLoading', false);
+            if (response.data.data) {
+                getResults(response.data);
+            }
+        });
+    }, 500);
 }
 const getResults = (items) => {
     emit('getResults', items);
