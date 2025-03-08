@@ -17,17 +17,19 @@ class SearchTest extends TestCase
      */
     public function can_get_results_search_by_price($data)
     {
-        Apartment::factory(5)->create([
-            'price' => 20000
-        ]);
-        Apartment::factory(5)->create([
-            'price' => 50000
-        ]);
+        $attributes = $data;
+        $attributes['price'] = $data['price'][1];
+        Apartment::factory()->create($attributes);
 
         $response = $this->postJson(route('search'), $data);
         $response->assertStatus(200)
             ->assertJson(fn(AssertableJson $json) => $json->has('data')
                 ->has('pagination')
+                ->where('data.0.name', $attributes['name'])
+                ->where('data.0.bedrooms', $attributes['bedrooms'])
+                ->where('data.0.bathrooms', $attributes['bathrooms'])
+                ->where('data.0.storeys', $attributes['storeys'])
+                ->where('data.0.price', number_format($attributes['price']))
             );
 
         $this->assertNotEmpty($response->json('data'));
@@ -37,13 +39,22 @@ class SearchTest extends TestCase
     {
         return [
             [
-                ['price' => [0, 5000]],
-                ['price' => [2000, 5000]],
-                ['name' => 'name'],
-                ['bathrooms' => 2],
-                ['bedrooms' => 4],
-                ['storeys' => 5],
-                ['garages' => 1],
+                [
+                    'name' => 'name',
+                    'price' => [0, 5000],
+                    'bathrooms' => 2,
+                    'bedrooms' => 4,
+                    'storeys' => 5,
+                    'garages' => 1
+                ],
+                [
+                    'name' => 'name',
+                    'price' => [1000, 3000],
+                    'bathrooms' => 1,
+                    'bedrooms' => 2,
+                    'storeys' => 1,
+                    'garages' => 2
+                ],
             ]
         ];
     }
